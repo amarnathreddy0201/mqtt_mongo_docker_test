@@ -44,7 +44,7 @@ def publish(client):
         else:
             print(f"Failed to send message to topic {topic}")
         msg_count += 1
-        if msg_count > 5:
+        if msg_count > 2000:
             break
 
 
