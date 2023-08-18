@@ -1,7 +1,13 @@
-import paho.mqtt.client as mqtt
 import os
+import logging
 
+import paho.mqtt.client as mqtt
 from .mongo import Mongo
+
+from .exception import log_errors
+
+# Creating an object
+logger = logging.getLogger()
 
 
 MQTT_BROKER = "broker.emqx.io" #"127.0.0.1"
@@ -29,25 +35,29 @@ class MQTT(object):
 
     # noinspection PyUnusedLocal
     @staticmethod
+    @log_errors
     def on_connect(client: mqtt.Client, userdata, flags, rc):
-        print("Connected MQTT")
+        logger.info("Connected MQTT")
         for topic in MQTT_TOPICS:
             client.subscribe(topic, MQTT_QOS)
 
     # noinspection PyUnusedLocal
+    @log_errors
     def on_message(self, client: mqtt.Client, userdata, msg: mqtt.MQTTMessage):
         """Save the data in mongobd on message received."""
-        print("Rx MQTT")
+        logger.info("Rx MQTT")
         self.mongo.save(msg)
 
+    @log_errors
     def run(self):
         """run the mqtt server"""
-        print("Running MQTT")
+        logger.info("Running MQTT")
         self.mqtt_client.connect(MQTT_BROKER, MQTT_PORT, MQTT_KEEPALIVE)
         self.mqtt_client.loop_forever()
 
+    @log_errors
     def stop(self):
         """For stop the mqtt"""
-        print("Stopping MQTT")
+        logger.info("Stopping MQTT")
         self.mqtt_client.loop_stop()
         self.mqtt_client.disconnect()
