@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     mongo.connect()
     mqtt.run()
-    print("tyfivyv")
+    logger.info("Running the mqtt and creating mqtt")
 
     mqtt.stop()
     mongo.disconnect()

@@ -32,6 +32,7 @@ class MQTT(object):
         self.mqtt_client = mqtt.Client()
         self.mqtt_client.on_connect = self.on_connect
         self.mqtt_client.on_message = self.on_message
+       
 
     # noinspection PyUnusedLocal
     @staticmethod
@@ -47,6 +48,7 @@ class MQTT(object):
         """Save the data in mongobd on message received."""
         logger.info("Rx MQTT")
         self.mongo.save(msg)
+        self.mongo.retrive_the_data()
 
     @log_errors
     def run(self):
