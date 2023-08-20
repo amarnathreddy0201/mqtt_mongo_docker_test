@@ -117,6 +117,6 @@ class Mongo(object):
         """ For fetching the data"""
         for data in self.collection.find({},
             {'_id':0,'sensor_id': 566, 'value': 2973, 'timestamp': '2023-08-20 19:01:39.763867'}): # _id : 0 represents no need to print id value.
-            print(data)
+            logger.info(data)
         else:
-            print("No data present")
+            logger.info("No data present")
