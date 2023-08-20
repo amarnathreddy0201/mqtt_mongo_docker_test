@@ -3,6 +3,7 @@ from datetime import datetime
 import os
 import threading
 import logging
+import json
 
 from .exception import log_errors
 
@@ -21,11 +22,12 @@ MONGO_COLLECTION = "mqtt"
 MONGO_TIMEOUT = 1  # Time in seconds
 MONGO_DATETIME_FORMAT = "%d/%m/%Y %H:%M:%S"
 
-MONGO_URI = os.getenv("MONGO_URI", MONGO_URI)
-MONGO_DB = os.getenv("MONGO_DB", MONGO_DB)
-MONGO_COLLECTION = os.getenv("MONGO_COLLECTION", MONGO_COLLECTION)
+MONGO_URI = os.getenv("MONGO_URI", MONGO_URI) # mongodb default url
+MONGO_DB = os.getenv("MONGO_DB", MONGO_DB) # mongodb creating database
+MONGO_COLLECTION = os.getenv("MONGO_COLLECTION", MONGO_COLLECTION) # Creating collection name
 MONGO_TIMEOUT = float(os.getenv("MONGO_TIMEOUT", MONGO_TIMEOUT))
 MONGO_DATETIME_FORMAT = os.getenv("MONGO_DATETIME_FORMAT", MONGO_DATETIME_FORMAT)
+
 
 
 class Mongo(object):
@@ -35,6 +37,7 @@ class Mongo(object):
         self.collection: pymongo.collection.Collection = None
         self.queue: List[mqtt.MQTTMessage] = list()
 
+
     @log_errors
     def connect(self):
         """Connecting the mongodb"""
@@ -42,7 +45,7 @@ class Mongo(object):
         self.client = pymongo.MongoClient(MONGO_URI, serverSelectionTimeoutMS=MONGO_TIMEOUT*1000.0)
         self.database = self.client.get_database(MONGO_DB)
         self.collection = self.database.get_collection(MONGO_COLLECTION)
-        print("conne")
+        
 
     @log_errors
     def disconnect(self):
@@ -50,6 +53,7 @@ class Mongo(object):
         if self.client:
             self.client.close()
             self.client = None
+
 
     @log_errors
     def connected(self) -> bool:
@@ -62,27 +66,25 @@ class Mongo(object):
         else:
             return True
 
+
     @log_errors
     def _enqueue(self, msg: mqtt.MQTTMessage):
         logger.info("Enqueuing")
         self.queue.append(msg)
         # TODO process queue
 
+
     @log_errors
     def __store_thread_f(self, msg: mqtt.MQTTMessage):
         logger.info("Storing")
         now = datetime.now()
-        
-            
-        document = {
-            "topic": msg.topic,
-            "payload": msg.payload.decode(),
-            "qos": msg.qos,
-            "timestamp": int(now.timestamp()),
-            "datetime": now.strftime(MONGO_DATETIME_FORMAT),
+        document =  json.loads(msg.payload.decode())
+            # "qos": msg.qos,
+            # "timestamp": int(now.timestamp()),
+            # "datetime": now.strftime(MONGO_DATETIME_FORMAT),
             # # TODO datetime must be fetched right when the message is received
             # # It will be wrong when a queued message is stored
-        }
+        
         logger.info(document)
         result = self.collection.insert_one(document)
         logger.info(f"Saved in Mongo document ID - { result.inserted_id}")
@@ -97,6 +99,7 @@ class Mongo(object):
         th.daemon = True
         th.start()
 
+
     @log_errors
     def save(self, msg: mqtt.MQTTMessage):
         logger.info("Saving")
@@ -107,3 +110,13 @@ class Mongo(object):
             self._store(msg)
         else:
             self._enqueue(msg)
+
+
+    @log_errors
+    def retrive_the_data(self):
+        """ For fetching the data"""
+        for data in self.collection.find({},
+            {'_id':0,'sensor_id': 566, 'value': 2973, 'timestamp': '2023-08-20 19:01:39.763867'}): # _id : 0 represents no need to print id value.
+            print(data)
+        else:
+            print("No data present")
