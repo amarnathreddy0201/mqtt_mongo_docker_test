@@ -110,3 +110,4 @@ if __name__== "__main__":
 
     red_mask = find_biggest_contour(image_red_closed,image)
     show_mask(image)
+    cv2.imwrite("finall_straberry.png",image)
