@@ -8,9 +8,9 @@ from datetime import datetime
 import json
 
 
-broker = 'broker.emqx.io'
-port = 1883
-topic = "python/mqtt"
+broker = 'broker.emqx.io' # Broker name
+port = 1883 # Port number of broker
+topic = "python/mqtt" # Topic for publishing or subscriping
 # Generate a Client ID with the publish prefix.
 client_id = f'publish-{random.randint(0, 1000)}'
 # username = 'emqx'
