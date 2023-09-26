@@ -91,15 +91,6 @@ if __name__== "__main__":
     # Clean up
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15))
 
-    # image_red_eroded = cv2.morphologyEx(image_red, cv2.MORPH_ERODE, kernel)
-    # show_mask(image_red_eroded)
-
-    # image_red_dilated = cv2.morphologyEx(image_red, cv2.MORPH_DILATE, kernel)
-    # show_mask(image_red_dilated)
-
-    # image_red_opened = cv2.morphologyEx(image_red, cv2.MORPH_OPEN, kernel)
-    # show_mask(image_red_opened)
-
     # Fill small gaps
     image_red_closed = cv2.morphologyEx(image_red, cv2.MORPH_CLOSE, kernel)
     #show_mask(image_red_closed)
